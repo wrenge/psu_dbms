@@ -1,9 +1,3 @@
-CREATE TYPE id_list AS TABLE
-(
-    id INT NOT NULL PRIMARY KEY
-)
-GO
-
 CREATE OR ALTER PROCEDURE issue_books(@reader_id INT,
                                       @return_date DATE,
                                       @instances_list id_list READONLY)
