@@ -1,4 +1,4 @@
-INSERT INTO City 
+INSERT INTO uni_library.dbo.City
     VALUES (N'Астрахань'),
     (N'Барнаул'),
     (N'Владивосток'),

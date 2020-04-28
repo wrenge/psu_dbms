@@ -1,4 +1,4 @@
-INSERT INTO Groups 
+INSERT INTO uni_library.dbo.Groups
 VALUES (N'19ВИС',1),
     (N'18ВИС',1),
     (N'17ВИС',1),

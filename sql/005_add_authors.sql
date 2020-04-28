@@ -1,4 +1,4 @@
-INSERT INTO Author 
+INSERT INTO uni_library.dbo.Author
     VALUES (N'Чиркин',N'Ричард',N'Семёнович'),
     (N'Иванушкин',N'Александр',N'Кармикоэльный'),
     (N'Хестанов',N'Андрей',N'Дрюзаевич'),

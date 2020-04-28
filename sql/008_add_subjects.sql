@@ -1,4 +1,4 @@
-INSERT INTO Subject 
+INSERT INTO uni_library.dbo.Subject
     VALUES (N'Радиоэлектроника'),
     (N'Программирование'),
     (N'Автоматизация'),

@@ -7,9 +7,9 @@ go
 CREATE TABLE Author
 (
     Author_id         integer IDENTITY ( 1,1 ),
-    Author_surname    varchar(20) NOT NULL,
-    Author_name        varchar(20) NOT NULL,
-    Author_patronymic varchar(20) NULL
+    Author_surname    nvarchar(20) NOT NULL,
+    Author_name        nvarchar(20) NOT NULL,
+    Author_patronymic nvarchar(20) NULL
 )
 go
 
@@ -33,7 +33,7 @@ go
 CREATE TABLE Books
 (
     Book_id      integer IDENTITY ( 1,1 ),
-    Book_name    varchar(128) NOT NULL,
+    Book_name    nvarchar(128) NOT NULL,
     Author_id    integer      NULL,
     Publisher_id integer      NOT NULL,
     Subject_id   integer      NULL,
@@ -50,7 +50,7 @@ go
 CREATE TABLE Category
 (
     Category_id   integer IDENTITY ( 1,1 ),
-    Category_name varchar(64) NOT NULL
+    Category_name nvarchar(64) NOT NULL
 )
 go
 
@@ -61,7 +61,7 @@ go
 CREATE TABLE City
 (
     City_id   integer IDENTITY ( 1,1 ),
-    City_name varchar(32) NOT NULL
+    City_name nvarchar(32) NOT NULL
 )
 go
 
@@ -72,7 +72,7 @@ go
 CREATE TABLE Classes
 (
     Class_id   integer IDENTITY ( 1,1 ),
-    Class_name varchar(20) NOT NULL
+    Class_name nvarchar(64) NOT NULL
 )
 go
 
@@ -83,8 +83,8 @@ go
 CREATE TABLE Faculties
 (
     Faculty_id      integer IDENTITY ( 1,1 ),
-    Faculty_name    varchar(128) NOT NULL,
-    Faculty_acronym varchar(10)  NOT NULL
+    Faculty_name    nvarchar(128) NOT NULL,
+    Faculty_acronym nvarchar(10)  NOT NULL
 )
 go
 
@@ -95,7 +95,7 @@ go
 CREATE TABLE Groups
 (
     Group_id   integer IDENTITY ( 1,1 ),
-    Group_name varchar(10) NOT NULL,
+    Group_name nvarchar(10) NOT NULL,
     Faculty_id integer     NOT NULL
 )
 go
@@ -135,7 +135,7 @@ go
 CREATE TABLE Publisher
 (
     Publisher_id   integer IDENTITY ( 1,1 ),
-    Publisher_name varchar(64) NOT NULL,
+    Publisher_name nvarchar(64) NOT NULL,
     City_id        integer     NOT NULL
 )
 go
@@ -147,9 +147,9 @@ go
 CREATE TABLE Readers
 (
     Reader_id         integer IDENTITY ( 1,1 ),
-    Reader_surname    varchar(20) NOT NULL,
-    Reader_name       varchar(20) NOT NULL,
-    Reader_patronymic varchar(20) NULL,
+    Reader_surname    nvarchar(20) NOT NULL,
+    Reader_name       nvarchar(20) NOT NULL,
+    Reader_patronymic nvarchar(20) NULL,
     Group_id          integer     NULL,
     Class_id          integer     NOT NULL,
     Registration_date datetime    NOT NULL,
@@ -178,7 +178,7 @@ go
 CREATE TABLE Subject
 (
     Subject_id   integer IDENTITY ( 1,1 ),
-    Subject_name varchar(32) NOT NULL
+    Subject_name nvarchar(32) NOT NULL
 )
 go
 
