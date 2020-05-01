@@ -1,3 +1,5 @@
+USE uni_library
+GO
 CREATE OR ALTER TRIGGER on_issue_book
     ON Issues
     AFTER INSERT

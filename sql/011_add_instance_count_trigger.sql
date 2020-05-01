@@ -1,3 +1,6 @@
+USE uni_library
+GO
+
 CREATE OR ALTER TRIGGER instance_total_count_increase
     ON Instance
     AFTER INSERT

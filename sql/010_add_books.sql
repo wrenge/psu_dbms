@@ -1,4 +1,4 @@
-INSERT INTO Books(Book_name, Author_id, Publisher_id, Subject_id, Category_id)
+INSERT INTO uni_library.dbo.Books(Book_name, Author_id, Publisher_id, Subject_id, Category_id)
 	VALUES
 	(N'Аппаратные интерфейсы ПК. Энциклопедия', 10, 15, NULL, 2),
 	(N'Архитектура операционной системы UNIX', 5, 11, 1, 1),

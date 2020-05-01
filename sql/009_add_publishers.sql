@@ -1,4 +1,4 @@
-INSERT INTO Publisher 
+INSERT INTO uni_library.dbo.Publisher
     VALUES (N'Наука ', 2),
     (N'Энергия ', 28),
     (N'МГТУ им. Н. Э. Баумана', 11),

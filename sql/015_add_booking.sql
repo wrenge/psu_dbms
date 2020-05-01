@@ -1,4 +1,4 @@
-
+USE uni_library
 INSERT INTO Booking
 	VALUES
 	(41,'20160807',1),
