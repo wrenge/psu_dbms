@@ -1,3 +1,4 @@
+-- ~1542 ms
 DECLARE @group_id INT;
 DECLARE qcursor CURSOR LOCAL FAST_FORWARD FOR
     SELECT Group_id
