@@ -1,4 +1,9 @@
--- ~303ms
+-- ~307ms
+USE uni_library
+GO
+
+CREATE VIEW ClosestReturnDate
+AS
 SELECT B.Book_name,
        (SELECT TOP (1) Return_date
         FROM Issues I1
