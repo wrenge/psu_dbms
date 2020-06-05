@@ -4,17 +4,17 @@ GO
 CREATE VIEW ReadersRating AS
 SELECT R.Reader_surname,
        R.Reader_name,
-       CAST(IIF(t.overall = 0, 1.0, 1.0 - (t.missed + t.outdated * 0.2) / t.overall) AS REAL) AS rating
+       CAST(t.overall * 0.2 - t.missed - t.outdated * 0.4 AS REAL) AS rating
 FROM (SELECT Reader_id,
              (SELECT Count(*)
               FROM Issues I
               WHERE R1.Reader_id = I.Reader_id
-                AND I.Return_date IS NULL
-                AND I.Receive_date < GETDATE())                               AS missed,
+                AND I.Receive_date IS NULL
+                AND I.Return_date < GETDATE())                               AS missed,
              (SELECT Count(*)
               FROM Issues I
               WHERE R1.Reader_id = I.Reader_id
-                AND I.Return_date > I.Receive_date)                           AS outdated,
+                AND I.Return_date < I.Receive_date)                           AS outdated,
              (SELECT Count(*) FROM Issues I WHERE R1.Reader_id = I.Reader_id) AS overall
       FROM Readers R1) AS t
          INNER JOIN Readers R
