@@ -1,18 +1,21 @@
--- ~95ms
-SELECT R.Reader_surname,
-       R.Reader_name,
-       CAST(t.overall * 0.2 - t.missed - t.outdated * 0.4 AS REAL) AS rating
-FROM (SELECT Reader_id,
-             (SELECT Count(*)
-              FROM Issues I
-              WHERE R1.Reader_id = I.Reader_id
-                AND I.Receive_date IS NULL
-                AND I.Return_date < GETDATE())                               AS missed,
-             (SELECT Count(*)
-              FROM Issues I
-              WHERE R1.Reader_id = I.Reader_id
-                AND I.Return_date < I.Receive_date)                           AS outdated,
-             (SELECT Count(*) FROM Issues I WHERE R1.Reader_id = I.Reader_id) AS overall
-      FROM Readers R1) AS t
-         INNER JOIN Readers R
-                    ON t.Reader_id = R.Reader_id
+DECLARE @min_date DATETIME = '01-01-2010' -- нижняя граница диапазона
+DECLARE @max_date DATETIME = '01-01-2012'; -- верхняя граница диапазона
+
+WITH tmp AS
+         (SELECT Reader_id, 0.2 AS rating
+          FROM Issues
+          WHERE @max_date BETWEEN Issue_date AND COALESCE(Receive_date, '31.12.9999')
+          UNION ALL
+          SELECT Reader_id, -1.2
+          FROM Issues
+          WHERE @max_date BETWEEN Return_date AND COALESCE(Receive_date, '31.12.9999')
+          UNION ALL
+          SELECT Reader_id, -0.4
+          FROM Issues
+          WHERE @max_date > COALESCE(Receive_date, '31.12.9999'))
+SELECT Reader_name, Reader_surname, sum(tmp.rating) rating
+FROM tmp
+         INNER JOIN Readers ON tmp.Reader_id = Readers.Reader_id
+WHERE @min_date BETWEEN Registration_date AND Exclusion_date
+GROUP BY Reader_name, Reader_surname
+ORDER BY rating DESC

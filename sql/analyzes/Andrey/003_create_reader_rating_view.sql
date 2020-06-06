@@ -1,21 +1,11 @@
--- ~99ms
-USE uni_library
-GO
-CREATE VIEW ReadersRating AS
-SELECT R.Reader_surname,
-       R.Reader_name,
-       CAST(t.overall * 0.2 - t.missed - t.outdated * 0.4 AS REAL) AS rating
-FROM (SELECT Reader_id,
-             (SELECT Count(*)
-              FROM Issues I
-              WHERE R1.Reader_id = I.Reader_id
-                AND I.Receive_date IS NULL
-                AND I.Return_date < GETDATE())                               AS missed,
-             (SELECT Count(*)
-              FROM Issues I
-              WHERE R1.Reader_id = I.Reader_id
-                AND I.Return_date < I.Receive_date)                           AS outdated,
-             (SELECT Count(*) FROM Issues I WHERE R1.Reader_id = I.Reader_id) AS overall
-      FROM Readers R1) AS t
-         INNER JOIN Readers R
-                    ON t.Reader_id = R.Reader_id
+ALTER VIEW ReaderIssuesView AS
+    SELECT R2.Reader_id,
+           Reader_surname,
+           Reader_name,
+           Registration_date,
+           Exclusion_date,
+           Issue_date,
+           Receive_date,
+           Return_date
+    FROM Issues I
+             INNER JOIN Readers R2 on I.Reader_id = R2.Reader_id
