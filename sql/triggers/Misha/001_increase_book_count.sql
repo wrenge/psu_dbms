@@ -1,16 +1,18 @@
-USE uni_library
-GO
-CREATE OR ALTER TRIGGER BookTotalIncreaseTrigger
-    ON Instance
-    AFTER INSERT
-    AS
+CREATE FUNCTION increase_total_book_count() RETURNS TRIGGER AS
+$$
 BEGIN
-    UPDATE Books
-    SET Count += cnt,
-    Total_count += cnt
-    FROM (SELECT Book_id, COUNT(*) as cnt
-          FROM inserted I1
-          GROUP BY Book_id) t
-             INNER JOIN Books B ON B.Book_id = t.Book_id
-end
-GO
+    UPDATE books
+    SET count       = count + cnt,
+        total_count = total_count + cnt
+    FROM (SELECT book_id, COUNT(*) as cnt
+          FROM NEW I1
+          GROUP BY book_id) t
+             INNER JOIN books B ON B.book_id = t.book_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER increase_total_book_count
+    AFTER INSERT OR UPDATE
+    ON instance
+    FOR EACH ROW
+EXECUTE PROCEDURE increase_total_book_count();
