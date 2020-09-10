@@ -1,18 +1,15 @@
-USE uni_library
-GO
+UPDATE books
+SET total_count = cnt
+FROM (SELECT book_id, COUNT(*) as cnt
+      FROM instance
+      GROUP BY book_id) t
+         INNER JOIN books B ON B.book_id = t.book_id;
 
-UPDATE Books
-SET Total_count = cnt
-FROM (SELECT Book_id, Count(*) as cnt
-      FROM Instance
-      GROUP BY Book_id) t
-         INNER JOIN Books B ON B.Book_id = t.Book_id
-
-UPDATE Books
-SET Count = B.Total_count - cnt
-FROM (SELECT Book_id, Count(*) as cnt
-      FROM Issues issues
-               INNER JOIN Instance I on issues.Instance_id = I.Instance_id
-      WHERE issues.Return_date < GETDATE()
-      GROUP BY Book_id) t
-         INNER JOIN Books B ON B.Book_id = t.Book_id
+UPDATE books
+SET count = B.total_count - cnt
+FROM (SELECT book_id, COUNT(*) as cnt
+      FROM issues Issues
+               INNER JOIN Instance I on Issues.instance_id = I.instance_id
+      WHERE Issues.return_date < NOW()
+      GROUP BY book_id) t
+         INNER JOIN books B ON B.book_id = t.book_id;
