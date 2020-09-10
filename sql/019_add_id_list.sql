@@ -1,7 +1,0 @@
-USE uni_library
-GO
-CREATE TYPE id_list AS TABLE
-(
-    id INT NOT NULL PRIMARY KEY
-)
-GO

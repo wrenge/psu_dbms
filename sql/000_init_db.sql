@@ -17,12 +17,23 @@ ALTER TABLE Author
     ADD CONSTRAINT XPKAuthor PRIMARY KEY CLUSTERED (Author_id ASC)
 go
 
+create table BookingStatus
+(
+	Status_id int identity
+		constraint BookingStatus_pk
+			primary key nonclustered,
+	Status_name NVARCHAR(32) not null
+)
+go
+
 CREATE TABLE Booking
 (
     Booking_id integer IDENTITY ( 1,1 ),
     Book_id    integer  NOT NULL,
     End_date   datetime NOT NULL,
-    Reader_id  integer  NOT NULL
+    Reader_id  integer  NOT NULL,
+    Close_date datetime,
+    Status_id int
 )
 go
 
@@ -92,10 +103,20 @@ ALTER TABLE Faculties
     ADD CONSTRAINT XPKFaculties PRIMARY KEY CLUSTERED (Faculty_id ASC)
 go
 
+create table GroupType
+(
+	Type_id int identity
+		constraint GroupType_pk
+			primary key nonclustered,
+	Type_name NVARCHAR(64) not null
+)
+go
+
 CREATE TABLE Groups
 (
     Group_id   integer IDENTITY ( 1,1 ),
-    Group_name nvarchar(10) NOT NULL,
+    Group_name nvarchar(32) NOT NULL,
+    Type_id integer not null,
     Faculty_id integer     NOT NULL
 )
 go
@@ -201,6 +222,11 @@ ALTER TABLE Booking
 
 go
 
+alter table Booking
+	add constraint Booking_BookingStatus_Status_id_fk
+		foreign key (Status_id) references BookingStatus
+go
+
 ALTER TABLE Books
     ADD CONSTRAINT R_3 FOREIGN KEY (Author_id) REFERENCES Author (Author_id)
         ON DELETE NO ACTION
@@ -234,6 +260,10 @@ ALTER TABLE Groups
         ON DELETE NO ACTION
         ON UPDATE NO ACTION
 
+go
+
+alter table Groups
+    add constraint Groups_GroupType_Type_id_fk foreign key (Type_id) references GroupType
 go
 
 ALTER TABLE Instance
