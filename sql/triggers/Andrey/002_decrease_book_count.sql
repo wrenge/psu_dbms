@@ -1,15 +1,19 @@
-USE uni_library
-GO
-CREATE TRIGGER IssueTrigger
-    ON Issues
-    AFTER INSERT
-    AS
+CREATE FUNCTION decrease_book_count() RETURNS TRIGGER AS
+$$
 BEGIN
-    UPDATE Books
-    SET Count = Count - cnt
-    FROM (SELECT Book_id, COUNT(*) as cnt
-          FROM inserted I1
-                   INNER JOIN Instance I2 on I1.Instance_id = I2.Instance_id
-          GROUP BY Book_id) t
-             INNER JOIN Books B ON B.Book_id = t.Book_id
-end
+    UPDATE books
+    SET count = B.count - cnt
+    FROM (SELECT book_id, COUNT(*) AS cnt
+          FROM NEW I1
+                   INNER JOIN instance I2 ON I1.instance_id = I2.instance_id
+          WHERE I1.receive_date is NULL
+          GROUP BY book_id) t
+             INNER JOIN books B ON B.book_id = t.book_id;
+END;
+$$ LANGUAGE plpgsql;
+
+CREATE TRIGGER decrease_book_count
+    AFTER INSERT OR UPDATE
+    ON issues
+    FOR EACH ROW
+EXECUTE PROCEDURE decrease_book_count();

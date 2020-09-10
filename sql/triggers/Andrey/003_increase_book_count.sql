@@ -1,33 +1,19 @@
-USE uni_library
-GO
-CREATE TRIGGER BookIncreaseUpdateTrigger
-    ON Issues
-    AFTER UPDATE
-    AS
+CREATE FUNCTION increase_book_count() RETURNS TRIGGER AS
+$$
 BEGIN
-    UPDATE Books
-    SET Count = Count + cnt
-    FROM (SELECT Book_id, COUNT(*) as cnt
-          FROM inserted I1
-                   INNER JOIN Instance I2 on I1.Instance_id = I2.Instance_id
-          WHERE I1.Receive_date IS NOT NULL
-          GROUP BY Book_id) t
-             INNER JOIN Books B ON B.Book_id = t.Book_id
-end
-GO
+    UPDATE books
+    SET count = count + cnt
+    FROM (SELECT book_id, COUNT(*) AS cnt
+          FROM OLD I1
+                   INNER JOIN instance I2 ON I1.instance_id = I2.instance_id
+          WHERE I1.receive_date IS NULL
+          GROUP BY book_id) t
+             INNER JOIN books B ON B.book_id = t.book_id;
+END;
+$$ LANGUAGE plpgsql;
 
-USE uni_library
-GO
-CREATE TRIGGER BookIncreaseDeleteTrigger
-    ON Issues
-    AFTER DELETE
-    AS
-BEGIN
-    UPDATE Books
-    SET Count = Count + cnt
-    FROM (SELECT Book_id, COUNT(*) as cnt
-          FROM deleted I1
-                   INNER JOIN Instance I2 on I1.Instance_id = I2.Instance_id
-          GROUP BY Book_id) t
-             INNER JOIN Books B ON B.Book_id = t.Book_id
-end
+CREATE TRIGGER increase_book_count
+    AFTER DELETE OR UPDATE
+    ON issues
+    FOR EACH ROW
+EXECUTE PROCEDURE increase_book_count();
