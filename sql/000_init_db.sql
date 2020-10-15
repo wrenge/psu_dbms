@@ -30,8 +30,7 @@ CREATE TABLE Books
     Book_name    VARCHAR(128) NOT NULL,
     Author_id    INTEGER      NULL,
     Publisher_id INTEGER      NOT NULL,
-    Subject_id   INTEGER      NULL,
-    Category_id  INTEGER      NOT NULL,
+    Subject_id   INTEGER      NOT NULL,
     Count        INTEGER      NOT NULL DEFAULT (0),
     Total_count  INTEGER      NOT NULL DEFAULT (0)
 );
@@ -126,7 +125,8 @@ CREATE TABLE Request
 CREATE TABLE Subject
 (
     Subject_id   SERIAL PRIMARY KEY,
-    Subject_name VARCHAR(32) NOT NULL
+    Subject_name VARCHAR(32) NOT NULL,
+    Category_id  INTEGER     NOT NULL
 );
 
 
@@ -168,7 +168,7 @@ ALTER TABLE Books
 
 
 
-ALTER TABLE Books
+ALTER TABLE Subject
     ADD CONSTRAINT R_7 FOREIGN KEY (Category_id) REFERENCES Category (Category_id)
         ON DELETE NO ACTION
         ON UPDATE NO ACTION;
