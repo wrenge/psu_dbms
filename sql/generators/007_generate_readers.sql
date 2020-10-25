@@ -1,52 +1,59 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateReaders @count INT, @min_date DATETIME
-AS
+CREATE OR REPLACE PROCEDURE generate_readers(IN count INT,
+                                             IN min_date TIMESTAMP) AS
+$$
+DECLARE
+    _name               VARCHAR;
+    _surname            VARCHAR;
+    _patronymic         VARCHAR;
+    _max_interval       INT;
+    _student_class_id   INT;
+    _group_type_id      INT;
+    _department_type_id INT;
+    _random_years       INT;
+    _registration_date  TIMESTAMP;
+    _exclusion_date     TIMESTAMP;
+    _class_id           INT;
+    _group_year         INT;
+    _group_id           INT;
+    _random_num         INT;
 BEGIN
-    DECLARE @i INT = 0
-    DECLARE @Name NVARCHAR(max)
-    DECLARE @SurName NVARCHAR(max)
-    DECLARE @Patronymic NVARCHAR(max)
-    DECLARE @max_interval INT = 2020 - YEAR(@min_date)
-    DECLARE @student_class_id INT
-    SELECT @student_class_id = Class_id FROM Classes WHERE Class_name = N'Студент'
-    DECLARE @group_type_id INT = (SELECT Type_id FROM GroupType WHERE Type_name = N'Группа')
-    DECLARE @department_type_id INT = (SELECT Type_id FROM GroupType WHERE Type_name = N'Кафедра')
+    _max_interval = 2020 - (SELECT extract(YEAR FROM min_date));
+    _student_class_id = (SELECT class_id FROM classes WHERE class_name = 'Студент' LIMIT 1);
+    _department_type_id = (SELECT type_id FROM grouptype WHERE type_name = 'Кафедра' LIMIT 1);
+    _group_type_id = (SELECT type_id FROM grouptype WHERE type_name = 'Группа' LIMIT 1);
+    FOR i IN 1..count
+        LOOP
+            _random_num = hash_numeric(currval('readers_reader_id_seq'));
+            SELECT * FROM random_person() INTO _name, _surname, _patronymic;
+            _random_years = ABS(_random_num) % _max_interval + 1;
+            _registration_date = _random_years * INTERVAL '1 year' + min_date;
+            _exclusion_date = (ABS(_random_num) % 6 + 1) * INTERVAL '1 year' + _registration_date;
 
-    WHILE @i < @count
-        BEGIN
-            EXEC RandomPerson @Name OUTPUT, @SurName OUTPUT, @Patronymic OUTPUT
-            DECLARE @random_years INT = (ABS(CHECKSUM(NEWID()))) % @max_interval
-            DECLARE @registration_date DATETIME = DATEADD(year, @random_years, @min_date)
-            DECLARE @exclusion_date DATETIME = DATEADD(year, (ABS(CHECKSUM(NEWID()))) % 6 + 1, @registration_date)
-            DECLARE @class_id INT
-            IF CHECKSUM(NEWID()) > 0
-                SELECT @class_id = @student_class_id
+            IF _random_num > 0 THEN
+                _class_id = _student_class_id;
             ELSE
-                SELECT TOP (1) @class_id = Class_id FROM Classes ORDER BY CHECKSUM(NEWID())
+                _class_id = (SELECT classes.class_id FROM classes ORDER BY _random_num LIMIT 1);
+            END IF;
 
-            DECLARE @group_year INT = YEAR(@registration_date) % 100
-            DECLARE @group_id INT
-            IF @class_id = @student_class_id
-                BEGIN
-                    SELECT TOP (1) @group_id = Group_id
-                    FROM Groups
-                    WHERE SUBSTRING(Group_name, 1, 2) = CONVERT(NVARCHAR(2), @group_year) AND Type_id = @group_type_id
-                    ORDER BY CHECKSUM(NEWID())
-                END
+            _group_year = (SELECT extract(YEAR FROM _registration_date))::INT % 100;
+            IF _class_id = _student_class_id THEN
+                _group_id = (SELECT groups.group_id
+                             FROM groups
+                             WHERE substr(group_name, 1, 2) = _group_year::VARCHAR(2)
+                               AND type_id = _group_type_id
+                             LIMIT 1);
             ELSE
-                BEGIN
-                    SELECT TOP (1) @group_id = Group_id
-                    FROM Groups
-                    WHERE Type_id = @department_type_id
-                    ORDER BY CHECKSUM(NEWID())
-                END
+                _group_id = (SELECT groups.group_id
+                             FROM groups
+                             WHERE type_id = _department_type_id
+                             ORDER BY _random_num
+                             LIMIT 1);
+            END IF;
 
-            INSERT INTO Readers(Reader_surname, Reader_name, Reader_patronymic, Group_id, Class_id, Registration_date,
-                                Exclusion_date)
-            VALUES (@SurName, @Name, @Patronymic, @group_id, @class_id, @registration_date, @exclusion_date)
-
-            SET @i = @i + 1
-        END
-END
+            INSERT INTO readers(reader_surname, reader_name, reader_patronymic, group_id, class_id, registration_date,
+                                exclusion_date)
+            VALUES (_surname, _name, _patronymic, _group_id, _class_id, _registration_date,
+                    _exclusion_date);
+        END LOOP;
+END;
+$$ LANGUAGE plpgsql;

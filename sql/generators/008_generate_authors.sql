@@ -1,19 +1,14 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateAuthors @count INT
-AS
+CREATE OR REPLACE PROCEDURE generate_authors(count INT) AS
+$$
+DECLARE
+    _name       VARCHAR;
+    _surname    VARCHAR;
+    _patronymic VARCHAR;
 BEGIN
-    DECLARE @i INT = 0
-    DECLARE @Name NVARCHAR(max)
-    DECLARE @SurName NVARCHAR(max)
-    DECLARE @Patronymic NVARCHAR(max)
-    WHILE @i < @count
-        BEGIN
-            EXEC RandomPerson @Name OUTPUT, @SurName OUTPUT, @Patronymic OUTPUT
-            INSERT INTO Author(Author_surname, Author_name, Author_patronymic)
-            VALUES (@SurName, @Name, @Patronymic)
-
-            SET @i = @i + 1
-        END
-END
+    FOR i IN 1..count
+        LOOP
+            SELECT * FROM random_person() INTO _name, _surname, _patronymic;
+            INSERT INTO author(author_surname, author_name, author_patronymic) VALUES (_surname, _name, _patronymic);
+        END LOOP;
+END;
+$$ LANGUAGE plpgsql

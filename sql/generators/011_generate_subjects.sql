@@ -1,27 +1,22 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateSubjects
+CREATE OR REPLACE PROCEDURE generate_subjects()
 AS
+$$
 BEGIN
-    CREATE TABLE #Subjects_Staging
+    CREATE TEMPORARY TABLE _subjects_staging
     (
-        Name      NVARCHAR(max),
-    )
+        name        VARCHAR,
+        category_id INT
+    );
 
-    BULK INSERT #Subjects_Staging
-        FROM 'C:\psu-dbms\data\subjects.csv'
-        WITH
-        (
-        FIRSTROW = 2,
-        FIELDTERMINATOR = ';', --CSV field delimiter
-        ROWTERMINATOR = '\n', --Use to shift the control to next row
-        TABLOCK
-        )
+    COPY _subjects_staging (name, category_id)
+        FROM '/import/uni-library/data/subjects.csv'
+        DELIMITER ';'
+        CSV HEADER;
 
-    INSERT INTO Subject(Subject_name)
-    SELECT Name
-    FROM #Subjects_Staging
+    INSERT INTO subject(subject_name, category_id)
+    SELECT name AS subject_name, category_id
+    FROM _subjects_staging;
 
-    DROP TABLE #Subjects_Staging
+    DROP TABLE _subjects_staging;
 END
+$$ LANGUAGE plpgsql

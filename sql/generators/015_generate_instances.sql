@@ -1,29 +1,20 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateInstances @instance_per_book INT
+CREATE OR REPLACE PROCEDURE generate_instances(instance_per_book INT)
 AS
+$$
+DECLARE
+    _book_id        INT;
+    _copy_condition INT;
+    _copy_year      INT;
 BEGIN
-    DECLARE @book_id NVARCHAR(64)
-
-    DECLARE book_cursor CURSOR LOCAL FAST_FORWARD
-        FOR SELECT Book_id FROM Books
-
-    OPEN book_cursor
-    FETCH NEXT FROM book_cursor INTO @book_id
-    WHILE @@FETCH_STATUS = 0
-        BEGIN
-            DECLARE @i INT = 0
-            WHILE @i < @instance_per_book
-                BEGIN
-                    DECLARE @copy_condition INT = ABS(CHECKSUM(NEWID())) % 101
-                    DECLARE @copy_year INT = ABS(CHECKSUM(NEWID())) % 21 + 2000
-                    INSERT INTO Instance(Book_id, Copy_condition, Copy_year)
-                    VALUES (@book_id, @copy_condition, @copy_year)
-                    SET @i = @i + 1
-                end
-            FETCH NEXT FROM book_cursor INTO @book_id
-        end
-    CLOSE book_cursor
-    DEALLOCATE book_cursor
-END
+    FOR _book_id IN (SELECT book_id FROM books)
+        LOOP
+            FOR i IN 1..instance_per_book
+                LOOP
+                    _copy_condition = ABS(hash_numeric(nextval('random_counter'))) % 101;
+                    _copy_year = ABS(hash_numeric(currval('random_counter'))) % 21 + 2000;
+                    INSERT INTO instance(book_id, copy_condition, copy_year)
+                    VALUES (_book_id, _copy_condition, _copy_year);
+                END LOOP;
+        END LOOP;
+END;
+$$ LANGUAGE plpgsql

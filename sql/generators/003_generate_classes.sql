@@ -1,27 +1,11 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateClasses
-AS
+CREATE OR REPLACE PROCEDURE generate_classes() AS
+$$
 BEGIN
-    CREATE TABLE #Classes_Staging
-    (
-        Name      NVARCHAR(max)
-    )
-
-    BULK INSERT #Classes_Staging
-        FROM 'C:\psu-dbms\data\Classes.csv'
-        WITH
-        (
-        FIRSTROW = 2,
-        FIELDTERMINATOR = ';', --CSV field delimiter
-        ROWTERMINATOR = '\n', --Use to shift the control to next row
-        TABLOCK
-        )
-
-    INSERT INTO Classes(Class_name)
-    SELECT Name
-    FROM #Classes_Staging
-
-    DROP TABLE #Classes_Staging
-END
+    INSERT INTO classes(class_name)
+    VALUES ('Студент'),
+           ('Преподаватель'),
+           ('Лаборант'),
+           ('Системный администратор'),
+           ('Сотрудник секретариата');
+END;
+$$ LANGUAGE plpgsql

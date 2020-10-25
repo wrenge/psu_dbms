@@ -20,8 +20,8 @@ CREATE TABLE Booking
     Book_id    INTEGER  NOT NULL,
     End_date   timestamp(3) NOT NULL,
     Reader_id  INTEGER  NOT NULL,
-    Close_date timestamp(3),
-    Status_id INTEGER
+    Close_date timestamp(3) NULL,
+    Status_id INTEGER NULL
 );
 
 CREATE TABLE Books

@@ -1,28 +1,9 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateFaculties
-AS
+CREATE OR REPLACE PROCEDURE generate_faculties() AS
+$$
 BEGIN
-    CREATE TABLE #Faculties_Staging
-    (
-        Name      NVARCHAR(max),
-        ShortName NVARCHAR(max)
-    )
-
-    BULK INSERT #Faculties_Staging
-        FROM 'C:\psu-dbms\data\Faculties.csv'
-        WITH
-        (
-        FIRSTROW = 2,
-        FIELDTERMINATOR = ';', --CSV field delimiter
-        ROWTERMINATOR = '\n', --Use to shift the control to next row
-        TABLOCK
-        )
-
-    INSERT INTO Faculties(Faculty_name, Faculty_acronym)
-    SELECT Name, ShortName
-    FROM #Faculties_Staging
-
-    DROP TABLE #Faculties_Staging
-END
+    INSERT INTO faculties(faculty_name, faculty_acronym) VALUES ('Факультет вычислительной техники', 'ФВТ');
+    INSERT INTO faculties(faculty_name, faculty_acronym)
+    VALUES ('Факультет приборостроения, информационных технологий и электроники', 'ФПИТЭ');
+    INSERT INTO faculties(faculty_name, faculty_acronym) VALUES ('Факультет машиностроения', 'ФМ');
+END;
+$$ LANGUAGE plpgsql;

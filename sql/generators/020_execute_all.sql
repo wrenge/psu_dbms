@@ -1,19 +1,16 @@
-USE uni_library
-GO
-
-EXEC GenerateFaculties
-EXEC GenerateGroups 10
-EXEC GenerateClasses
-EXEC ImportNames
-EXEC ImportSurNames
-EXEC GenerateReaders 20000, '01/01/2010' -- 20 sec
-EXEC GenerateAuthors 100 -- 20 s
-EXEC GenerateCities
-EXEC GenerateSubjects
-EXEC GeneratePublishers
-EXEC GenerateSciBooks 2
-EXEC GenerateFiBooks 2
-EXEC GenerateInstances 100
-EXEC GenerateBooking 5000 -- 35 s
-EXEC GenerateIssues 10000 -- 150 s
-EXEC GenerateRequests '01/01/2010'
+CREATE SEQUENCE IF NOT EXISTS random_counter;
+CALL generate_faculties();
+CALL generate_groups(10);
+CALL generate_classes();
+CALL import_names();
+CALL generate_readers(1000, '01/01/2010');
+CALL generate_authors(100);
+CALL generate_cities();
+CALL generate_subjects();
+CALL generate_publishers();
+CALL generate_sci_books(2);
+CALL generate_fi_books(2);
+CALL generate_instances(100);
+CALL generate_booking(2000);
+CALL generate_issues(5000);
+CALL generate_requests('01/01/2010');

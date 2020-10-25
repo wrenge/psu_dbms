@@ -1,4 +1,3 @@
-USE uni_library
-GO
-
-INSERT INTO GroupType(Type_name) VALUES (N'Группа'), (N'Кафедра')
+INSERT INTO grouptype(type_name)
+VALUES (N'Группа'),
+       (N'Кафедра');

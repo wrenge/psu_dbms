@@ -1,4 +1,4 @@
-INSERT INTO uni_library.dbo.BookingStatus (Status_name)
+INSERT INTO bookingstatus (status_name)
 VALUES (N'Окончена'),
        (N'Отменена'),
        (N'Выполнена')

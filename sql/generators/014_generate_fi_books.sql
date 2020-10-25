@@ -1,49 +1,49 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateFiBooks @publisher_per_book INT
+CREATE OR REPLACE PROCEDURE generate_fi_books(publishers_per_book INT)
 AS
+$$
+DECLARE
+    _book_name        VARCHAR;
+    _author_count     INT;
+    _subject_count    INT;
+    _category_id      INT;
+    _publishers_count INT;
+    _author_id        INT;
+    _subject_id       INT;
+    _publisher_id     INT;
 BEGIN
-    CREATE TABLE #Books_Staging
+    CREATE TEMPORARY TABLE _books_staging
     (
-        Name NVARCHAR(max),
-    )
+        name VARCHAR
+    );
 
-    BULK INSERT #Books_Staging
-        FROM 'C:\psu-dbms\data\fiction_books.csv'
-        WITH
-        (
-        FIRSTROW = 2,
-        FIELDTERMINATOR = ';', --CSV field delimiter
-        ROWTERMINATOR = '\n', --Use to shift the control to next row
-        TABLOCK
-        )
+    COPY _books_staging (name)
+        FROM '/import/uni-library/data/fiction_books.csv'
+        DELIMITER ';'
+        CSV HEADER;
 
-    DECLARE @name NVARCHAR(64)
-    DECLARE @publisher_count INT = (SELECT COUNT(*) FROM Publisher)
-    DECLARE @author_count INT = (SELECT COUNT(*) FROM Author)
-    DECLARE @category_id INT = (SELECT Category_id FROM Category WHERE Category_name = N'Художественная литература')
 
-    DECLARE names_cursor CURSOR LOCAL FAST_FORWARD
-        FOR SELECT DISTINCT Name FROM #Books_Staging
+    _publishers_count = (SELECT COUNT(*) FROM publisher);
+    _author_count = (SELECT COUNT(*) FROM author);
+    _subject_count = (SELECT COUNT(*) FROM subject);
+    _category_id = (SELECT category_id FROM category WHERE category_name = N'Художественная литература');
 
-    OPEN names_cursor
-    FETCH NEXT FROM names_cursor INTO @name
-    WHILE @@FETCH_STATUS = 0
-        BEGIN
-            DECLARE @i INT = 0
-            DECLARE @author_id INT = ABS(CHECKSUM(NEWID())) % @author_count + 1
-            WHILE @i < @publisher_per_book
-                BEGIN
-                    DECLARE @publisher_id INT = ABS(CHECKSUM(NEWID())) % @publisher_count + 1
-                    INSERT INTO Books(Book_name, Author_id, Publisher_id, Subject_id, Category_id)
-                    VALUES (@name, @author_id, @publisher_id, NULL, @category_id)
-                    SET @i = @i + 1
-                end
-            FETCH NEXT FROM names_cursor INTO @name
-        end
-    CLOSE names_cursor
-    DEALLOCATE names_cursor
+    FOR _book_name IN (SELECT DISTINCT name FROM _books_staging)
+        LOOP
+            _author_id = abs(hash_numeric(currval('books_book_id_seq'))) % _author_count + 1;
+            _subject_id =
+                    (SELECT subject_id
+                     FROM subject
+                     WHERE category_id = 1
+                     ORDER BY ABS(currval('books_book_id_seq'))
+                     LIMIT 1);
+            FOR i IN 1..publishers_per_book
+                LOOP
+                    _publisher_id = abs(hash_numeric(currval('books_book_id_seq'))) % _publishers_count + 1;
+                    INSERT INTO books(book_name, author_id, publisher_id, subject_id)
+                    VALUES (_book_name, _author_id, _publisher_id, _subject_id);
+                END LOOP;
+        END LOOP;
 
-    DROP TABLE #Books_Staging
+    DROP TABLE _books_staging;
 END
+$$ LANGUAGE plpgsql

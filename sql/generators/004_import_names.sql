@@ -1,23 +1,25 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE ImportNames
-AS
+CREATE OR REPLACE PROCEDURE import_names() AS
+$$
 BEGIN
     CREATE TABLE russian_names
     (
-        Name             NVARCHAR(max),
-        Sex              NVARCHAR(max),
-    )
+        name   VARCHAR,
+        gender VARCHAR
+    );
 
-    BULK INSERT russian_names
-        FROM 'C:\psu-dbms\data\russian_names.csv'
-        WITH
-        (
-        FIRSTROW = 2,
-        FIELDTERMINATOR = ';', --CSV field delimiter
-        ROWTERMINATOR = '\n', --Use to shift the control to next row
-        TABLOCK
-        )
+    CREATE TABLE russian_surnames
+    (
+        name VARCHAR
+    );
 
-END
+    COPY russian_names (name, gender)
+        FROM '/import/uni-library/data/russian_names.csv'
+        DELIMITER ';'
+        CSV HEADER;
+
+    COPY russian_surnames (name)
+        FROM '/import/uni-library/data/russian_surnames.csv'
+        DELIMITER ';'
+        CSV HEADER;
+END;
+$$ LANGUAGE plpgsql

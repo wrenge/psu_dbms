@@ -1,34 +1,39 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateIssues @count INT
+CREATE OR REPLACE PROCEDURE generate_issues(count INT)
 AS
+$$
+DECLARE
+    _instance_id    INT;
+    _instance_count INT;
+    _reader_id      INT;
+    _from_date      TIMESTAMP;
+    _to_date        TIMESTAMP;
+    _issue_date     TIMESTAMP;
+    _return_date    TIMESTAMP;
+    _receive_date   TIMESTAMP;
+    _random_num     INT;
 BEGIN
+    _instance_count = (SELECT COUNT(*) FROM instance);
+    FOR i IN 1..count
+        LOOP
+            _random_num = hash_numeric(nextval('random_counter'));
+            _instance_id = abs(hash_numeric(currval('random_counter'))) % _instance_count + 1;
 
-    DECLARE @i INT = 0
-    WHILE @i < @count
-        BEGIN
-            DECLARE @instance_id INT = (SELECT TOP (1) Instance_id FROM Instance ORDER BY ABS(CHECKSUM(NEWID())))
-            DECLARE @reader_id INT
-            DECLARE @from_date DATETIME
-            DECLARE @to_date DATETIME
+            SELECT reader_id, registration_date, exclusion_date
+            INTO _reader_id, _from_date, _to_date
+            FROM readers
+            ORDER BY ABS(hash_numeric(currval('random_counter')))
+            LIMIT 1;
+            _issue_date = random_date_range(_from_date, _to_date, _random_num);
+            _return_date = _issue_date + INTERVAL '3 years';
+            _receive_date = NULL;
 
-            SELECT TOP (1) @reader_id = Reader_id, @from_date = Registration_date, @to_date = Exclusion_date
-            FROM Readers
-            ORDER BY ABS(CHECKSUM(NEWID()))
+            IF _random_num > 0 THEN
+                _receive_date = random_date_range(_issue_date, _to_date, _random_num);
+            END IF;
 
-            DECLARE @issue_date DATETIME = DATEADD(DAY, CHECKSUM(NEWID()) % DATEDIFF(DAY, @from_date, @to_date),
-                                                     @from_date)
-            DECLARE @return_date DATETIME = DATEADD(year, 3, @issue_date)
-            DECLARE @receive_date DATETIME = NULL
-            IF CHECKSUM(NEWID()) > 0
-                BEGIN
-                    SET @receive_date = DATEADD(DAY, CHECKSUM(NEWID()) % DATEDIFF(DAY, @from_date, @to_date),
-                                                     @from_date)
-                end
+            --             INSERT INTO issues(reader_id, instance_id, issue_date, receive_date, return_date)
+--             VALUES (_reader_id, _instance_id, _issue_date, _receive_date, _return_date);
+        END LOOP;
 
-            INSERT INTO Issues(Reader_id, Instance_id, Issue_date, Receive_date, Return_date)
-            VALUES (@reader_id, @instance_id, @issue_date, @receive_date, @return_date)
-            SET @i = @i + 1
-        end
-END
+END;
+$$ LANGUAGE plpgsql

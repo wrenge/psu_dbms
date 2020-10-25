@@ -1,3 +1,3 @@
-INSERT INTO uni_library.dbo.Category
-VALUES (N'Научная литература'),
-       (N'Художественная литература');
+INSERT INTO category (category_name)
+VALUES ('Научная литература'),
+       ('Художественная литература');

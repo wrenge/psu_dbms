@@ -1,31 +1,32 @@
-USE uni_library
-GO
+CREATE SEQUENCE IF NOT EXISTS person_sequence;
 
-CREATE OR ALTER PROCEDURE RandomPerson @Name NVARCHAR(max) OUTPUT,
-                              @SurName NVARCHAR(max) OUTPUT,
-                              @Patronymic NVARCHAR(max) OUTPUT
-AS
+CREATE OR REPLACE FUNCTION random_person(OUT person_name VARCHAR,
+                                         OUT person_surname VARCHAR,
+                                         OUT person_patronymic VARCHAR) AS
+$$
+DECLARE
+    person_gender VARCHAR;
 BEGIN
-    DECLARE @sex NVARCHAR(max)
-    SELECT TOP (1) @sex = Sex, @Name = Name
+    SELECT gender, name INTO person_gender, person_name
     FROM russian_names
-    ORDER BY ABS(CHECKSUM(NEWID()))
+    ORDER BY abs(hash_numeric(nextval('person_sequence')))
+    LIMIT 1;
 
-    SELECT TOP (1) @SurName = Name
+    SELECT name INTO person_surname
     FROM russian_surnames
-    ORDER BY ABS(CHECKSUM(NEWID()))
+    ORDER BY abs(hash_numeric(nextval('person_sequence')))
+    LIMIT 1;
 
-    SELECT TOP (1) @Patronymic = Name
+    SELECT name INTO person_patronymic
     FROM russian_surnames
-    ORDER BY -ABS(CHECKSUM(NEWID()))
+    ORDER BY abs(hash_numeric(nextval('person_sequence')))
+    LIMIT 1;
 
-    IF @sex = N'Ж'
-        BEGIN
-            SET @SurName = CONCAT(@SurName, N'а')
-            SET @Patronymic = CONCAT(@Patronymic, N'на')
-        END
+    IF person_gender = 'Ж' THEN
+        person_surname = concat(person_surname, 'а');
+        person_patronymic = concat(person_patronymic, 'на');
     ELSE
-        BEGIN
-            SET @Patronymic = CONCAT(@Patronymic, N'ич')
-        END
-END
+        person_patronymic = concat(person_patronymic, 'ич');
+    END IF;
+END;
+$$ LANGUAGE plpgsql

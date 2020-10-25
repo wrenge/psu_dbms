@@ -1,37 +1,46 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateBooking @count INT
+CREATE OR REPLACE PROCEDURE generate_booking(count INT)
 AS
+$$
+DECLARE
+    _status_count INT;
+    _book_id      INT;
+    _reader_id    INT;
+    _from_date    TIMESTAMP;
+    _to_date      TIMESTAMP;
+    _end_date     TIMESTAMP;
+    _close_date   TIMESTAMP;
+    _status_id    INT;
+    _booking_date TIMESTAMP;
+    _random_num   INT;
 BEGIN
+    _status_count = (SELECT COUNT(*) FROM bookingstatus);
+    FOR i IN 1..count
+        LOOP
+            _random_num = hash_numeric(nextval('random_counter'));
 
-    DECLARE @i INT = 0
-    DECLARE @status_count INT = (SELECT COUNT(*) FROM BookingStatus)
-    WHILE @i < @count
-        BEGIN
-            DECLARE @book_id INT = (SELECT TOP (1) Book_id FROM Books ORDER BY ABS(CHECKSUM(NEWID())))
-            DECLARE @reader_id INT
-            DECLARE @from_date DATETIME
-            DECLARE @to_date DATETIME
+            _book_id =
+                    (SELECT book_id
+                     FROM books
+                     ORDER BY ABS(hash_numeric(currval('random_counter')))
+                     LIMIT 1);
 
-            SELECT TOP (1) @reader_id = Reader_id, @from_date = Registration_date, @to_date = Exclusion_date
-            FROM Readers
-            ORDER BY ABS(CHECKSUM(NEWID()))
+            SELECT reader_id, registration_date, exclusion_date
+            INTO _reader_id, _from_date, _to_date
+            FROM readers
+            ORDER BY ABS(hash_numeric(currval('random_counter')))
+            LIMIT 1;
 
-            DECLARE @booking_date DATETIME = DATEADD(DAY, CHECKSUM(NEWID()) % DATEDIFF(DAY, @from_date, @to_date),
-                                                     @from_date)
-            DECLARE @end_date DATETIME = DATEADD(year, 3, @booking_date)
-            DECLARE @close_date DATETIME = NULL
-            DECLARE @status_id INT = NULL
-            IF CHECKSUM(NEWID()) > 0
-                BEGIN
-                    SET @close_date = DATEADD(DAY, CHECKSUM(NEWID()) % DATEDIFF(DAY, @from_date, @end_date),
-                                                     @from_date)
-                    SET @status_id = ABS(CHECKSUM(NEWID())) % @status_count + 1
-                end
+            _booking_date = random_date_range(_from_date, _to_date, _random_num);
+            _end_date = _booking_date + INTERVAL '3 years';
+            _close_date = NULL;
+            _status_id = NULL;
 
-            INSERT INTO Booking(Book_id, End_date, Reader_id, Close_date, Status_id)
-            VALUES (@book_id, @end_date, @reader_id, @close_date, @status_id)
-            SET @i = @i + 1
-        end
-END
+            IF _random_num > 0 THEN
+                _close_date = random_date_range(_booking_date, _end_date, _random_num);
+                _status_id = ABS(_random_num) % _status_count + 1;
+            END IF;
+            INSERT INTO booking(book_id, end_date, reader_id, close_date, status_id)
+            VALUES (_book_id, _end_date, _reader_id, _close_date, _status_id);
+        END LOOP;
+END;
+$$ LANGUAGE plpgsql;

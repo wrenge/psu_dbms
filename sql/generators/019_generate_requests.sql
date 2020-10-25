@@ -1,27 +1,18 @@
-USE uni_library
-GO
-
-CREATE OR ALTER PROCEDURE GenerateRequests @min_date DATETIME
-AS
+CREATE OR REPLACE PROCEDURE generate_requests(min_date TIMESTAMP) AS
+$$
+DECLARE
+    _request_cost     INT;
+    _request_quantity INT;
+    _request_date     TIMESTAMP;
+    _book_id          INT;
+    _random_num       INT;
 BEGIN
-    DECLARE @book_id NVARCHAR(64)
-
-    DECLARE book_cursor CURSOR LOCAL FAST_FORWARD
-        FOR SELECT Book_id FROM Books
-
-    OPEN book_cursor
-    FETCH NEXT FROM book_cursor INTO @book_id
-    WHILE @@FETCH_STATUS = 0
-        BEGIN
-            DECLARE @i INT = 0
-            DECLARE @request_cost INT = ABS(CHECKSUM(NEWID())) % 1200 + 300
-            DECLARE @request_quantity INT = ABS(CHECKSUM(NEWID())) % 200 + 1
-            DECLARE @request_date DATETIME = DATEADD(YEAR, ABS(CHECKSUM(NEWID())) % 6 + 1, @min_date)
-            INSERT INTO Request(Book_id, Request_cost, Request_Quantity, Request_date)
-            VALUES (@book_id, @request_cost, @request_quantity, @request_date)
-            SET @i = @i + 1
-            FETCH NEXT FROM book_cursor INTO @book_id
-        end
-    CLOSE book_cursor
-    DEALLOCATE book_cursor
-END
+    FOR _book_id IN (SELECT book_id FROM books)
+        LOOP
+            _random_num = hash_numeric(nextval('random_counter'));
+            _request_cost = abs(_random_num) % 1200 + 300;
+            _request_quantity = abs(_random_num) % 200 + 1;
+            _request_date = min_date + (abs(_random_num) % 6 + 1) * INTERVAL '1 year';
+        END LOOP;
+END;
+$$ LANGUAGE plpgsql
