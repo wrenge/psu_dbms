@@ -31,8 +31,8 @@ BEGIN
                 _receive_date = random_date_range(_issue_date, _to_date, _random_num);
             END IF;
 
-            --             INSERT INTO issues(reader_id, instance_id, issue_date, receive_date, return_date)
---             VALUES (_reader_id, _instance_id, _issue_date, _receive_date, _return_date);
+            INSERT INTO issues(reader_id, instance_id, issue_date, receive_date, return_date)
+            VALUES (_reader_id, _instance_id, _issue_date, _receive_date, _return_date);
         END LOOP;
 
 END;
