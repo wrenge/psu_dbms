@@ -23,7 +23,7 @@ BEGIN
     _group_type_id = (SELECT type_id FROM grouptype WHERE type_name = 'Группа' LIMIT 1);
     FOR i IN 1..count
         LOOP
-            _random_num = hash_numeric(currval('readers_reader_id_seq'));
+            _random_num = hash_numeric(nextval('random_counter'));
             SELECT * FROM random_person() INTO _name, _surname, _patronymic;
             _random_years = ABS(_random_num) % _max_interval + 1;
             _registration_date = _random_years * INTERVAL '1 year' + min_date;

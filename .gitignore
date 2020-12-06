@@ -158,3 +158,4 @@ fabric.properties
 .idea/*
 */.idea/*
 .vscode/settings.json
+docker/postgres/.env

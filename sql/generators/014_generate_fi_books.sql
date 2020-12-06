@@ -17,7 +17,7 @@ BEGIN
     );
 
     COPY _books_staging (name)
-        FROM '/import/uni-library/data/fiction_books.csv'
+        FROM '/usr/import/data/fiction_books.csv'
         DELIMITER ';'
         CSV HEADER;
 
@@ -29,16 +29,16 @@ BEGIN
 
     FOR _book_name IN (SELECT DISTINCT name FROM _books_staging)
         LOOP
-            _author_id = abs(hash_numeric(currval('books_book_id_seq'))) % _author_count + 1;
+            _author_id = abs(hash_numeric(nextval('random_counter'))) % _author_count + 1;
             _subject_id =
                     (SELECT subject_id
                      FROM subject
                      WHERE category_id = 1
-                     ORDER BY ABS(currval('books_book_id_seq'))
+                     ORDER BY ABS(nextval('random_counter'))
                      LIMIT 1);
             FOR i IN 1..publishers_per_book
                 LOOP
-                    _publisher_id = abs(hash_numeric(currval('books_book_id_seq'))) % _publishers_count + 1;
+                    _publisher_id = abs(hash_numeric(nextval('random_counter'))) % _publishers_count + 1;
                     INSERT INTO books(book_name, author_id, publisher_id, subject_id)
                     VALUES (_book_name, _author_id, _publisher_id, _subject_id);
                 END LOOP;

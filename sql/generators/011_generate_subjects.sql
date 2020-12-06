@@ -9,7 +9,7 @@ BEGIN
     );
 
     COPY _subjects_staging (name, category_id)
-        FROM '/import/uni-library/data/subjects.csv'
+        FROM '/usr/import/data/subjects.csv'
         DELIMITER ';'
         CSV HEADER;
 

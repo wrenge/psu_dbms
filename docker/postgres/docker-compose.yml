@@ -1,0 +1,11 @@
+version: '3.1'
+services:
+  postgres:
+    image: postgres
+    init: true
+    environment:
+      POSTGRES_PASSWORD: test
+    volumes:
+      - './../../data:/usr/import/data'
+    ports:
+      - '5432:5432'

@@ -10,7 +10,7 @@ BEGIN
     );
 
     COPY _publishers_staging (name)
-        FROM '/import/uni-library/data/Publishers.csv'
+        FROM '/usr/import/data/Publishers.csv'
         DELIMITER ';'
         CSV HEADER;
 

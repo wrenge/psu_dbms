@@ -13,12 +13,12 @@ BEGIN
     );
 
     COPY russian_names (name, gender)
-        FROM '/import/uni-library/data/russian_names.csv'
+        FROM '/usr/import/data/russian_names.csv'
         DELIMITER ';'
         CSV HEADER;
 
     COPY russian_surnames (name)
-        FROM '/import/uni-library/data/russian_surnames.csv'
+        FROM '/usr/import/data/russian_surnames.csv'
         DELIMITER ';'
         CSV HEADER;
 END;

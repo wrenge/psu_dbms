@@ -32,7 +32,7 @@ BEGIN
 
     FOR v_group_name IN SELECT DISTINCT group_names.name FROM group_names
         LOOP
-            v_faculty_id = ABS(hash_numeric(currval('groups_group_id_seq'))) % v_faculty_count + 1;
+            v_faculty_id = ABS(hash_numeric(nextval('random_counter'))) % v_faculty_count + 1;
             FOR i IN p_start_year..v_end_year
                 LOOP
                     v_full_name = CONCAT(i, v_group_name);

@@ -36,3 +36,6 @@ FROM faculties;
 ALTER SEQUENCE faculties_faculty_id_seq RESTART WITH 1;
 ALTER SEQUENCE IF EXISTS person_sequence RESTART WITH 1;
 ALTER SEQUENCE IF EXISTS random_counter RESTART WITH 1;
+
+DROP TABLE russian_names;
+DROP TABLE russian_surnames;
