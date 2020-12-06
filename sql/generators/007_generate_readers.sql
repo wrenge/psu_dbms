@@ -16,6 +16,7 @@ DECLARE
     _group_year         INT;
     _group_id           INT;
     _random_num         INT;
+    _random_seed        REAL;
 BEGIN
     _max_interval = 2020 - (SELECT extract(YEAR FROM min_date));
     _student_class_id = (SELECT class_id FROM classes WHERE class_name = 'Студент' LIMIT 1);
@@ -24,6 +25,7 @@ BEGIN
     FOR i IN 1..count
         LOOP
             _random_num = hash_numeric(nextval('random_counter'));
+            _random_seed = CAST((_random_num % 10000) as real) / 10000;
             SELECT * FROM random_person() INTO _name, _surname, _patronymic;
             _random_years = ABS(_random_num) % _max_interval + 1;
             _registration_date = _random_years * INTERVAL '1 year' + min_date;
@@ -32,22 +34,30 @@ BEGIN
             IF _random_num > 0 THEN
                 _class_id = _student_class_id;
             ELSE
-                _class_id = (SELECT classes.class_id FROM classes ORDER BY _random_num LIMIT 1);
+                SELECT classes.class_id, setseed(_random_seed)
+                INTO _class_id
+                FROM classes
+                WHERE classes.class_id != _student_class_id
+                ORDER BY random()
+                LIMIT 1;
             END IF;
 
             _group_year = (SELECT extract(YEAR FROM _registration_date))::INT % 100;
             IF _class_id = _student_class_id THEN
-                _group_id = (SELECT groups.group_id
-                             FROM groups
-                             WHERE substr(group_name, 1, 2) = _group_year::VARCHAR(2)
-                               AND type_id = _group_type_id
-                             LIMIT 1);
+                SELECT groups.group_id
+                INTO _group_id
+                FROM groups
+                WHERE substr(group_name, 1, 2) = _group_year::VARCHAR(2)
+                  AND type_id = _group_type_id
+                ORDER BY random()
+                LIMIT 1;
             ELSE
-                _group_id = (SELECT groups.group_id
-                             FROM groups
-                             WHERE type_id = _department_type_id
-                             ORDER BY _random_num
-                             LIMIT 1);
+                SELECT groups.group_id
+                INTO _group_id
+                FROM groups
+                WHERE type_id = _department_type_id
+                ORDER BY random()
+                LIMIT 1;
             END IF;
 
             INSERT INTO readers(reader_surname, reader_name, reader_patronymic, group_id, class_id, registration_date,

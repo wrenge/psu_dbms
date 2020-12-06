@@ -11,17 +11,19 @@ DECLARE
     _return_date    TIMESTAMP;
     _receive_date   TIMESTAMP;
     _random_num     INT;
+    _random_seed    REAL;
 BEGIN
     _instance_count = (SELECT COUNT(*) FROM instance);
     FOR i IN 1..count
         LOOP
             _random_num = hash_numeric(nextval('random_counter'));
+            _random_seed = CAST((_random_num % 10000) as real) / 10000;
             _instance_id = abs(hash_numeric(currval('random_counter'))) % _instance_count + 1;
 
-            SELECT reader_id, registration_date, exclusion_date
+            SELECT reader_id, registration_date, exclusion_date, setseed(_random_seed)
             INTO _reader_id, _from_date, _to_date
             FROM readers
-            ORDER BY ABS(hash_numeric(currval('random_counter')))
+            ORDER BY random()
             LIMIT 1;
             _issue_date = random_date_range(_from_date, _to_date, _random_num);
             _return_date = _issue_date + INTERVAL '3 years';

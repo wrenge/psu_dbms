@@ -33,8 +33,8 @@ BEGIN
             _subject_id =
                     (SELECT subject_id
                      FROM subject
-                     WHERE category_id = 1
-                     ORDER BY ABS(nextval('random_counter'))
+                     WHERE category_id = _category_id
+                     ORDER BY ABS(hash_numeric(nextval('random_counter')))
                      LIMIT 1);
             FOR i IN 1..publishers_per_book
                 LOOP
