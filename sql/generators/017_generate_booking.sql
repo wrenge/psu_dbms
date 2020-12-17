@@ -12,22 +12,21 @@ DECLARE
     _status_id    INT;
     _booking_date TIMESTAMP;
     _random_num   INT;
+    _random_seed  REAL;
+    _book_count   INT;
 BEGIN
     _status_count = (SELECT COUNT(*) FROM bookingstatus);
+    _book_count = (SELECT count(*) FROM books);
     FOR i IN 1..count
         LOOP
             _random_num = hash_numeric(nextval('random_counter'));
+            _random_seed = CAST((_random_num % 10000) as real) / 10000;
+            _book_id = abs(_random_num) % _book_count + 1;
 
-            _book_id =
-                    (SELECT book_id
-                     FROM books
-                     ORDER BY ABS(hash_numeric(currval('random_counter')))
-                     LIMIT 1);
-
-            SELECT reader_id, registration_date, exclusion_date
+            SELECT reader_id, registration_date, exclusion_date, setseed(_random_seed)
             INTO _reader_id, _from_date, _to_date
             FROM readers
-            ORDER BY ABS(hash_numeric(currval('random_counter')))
+            ORDER BY random()
             LIMIT 1;
 
             _booking_date = random_date_range(_from_date, _to_date, _random_num);

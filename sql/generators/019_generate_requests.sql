@@ -12,7 +12,7 @@ BEGIN
             _random_num = hash_numeric(nextval('random_counter'));
             _request_cost = abs(_random_num) % 1200 + 300;
             _request_quantity = abs(_random_num) % 200 + 1;
-            _request_date = min_date + (abs(_random_num) % 6 + 1) * INTERVAL '1 year';
+            _request_date = random_date_range(min_date, min_date + interval '7 years', _random_num);
             INSERT INTO request(book_id, request_cost, request_quantity, request_date)
             VALUES (_book_id, _request_cost, _request_quantity, _request_date);
         END LOOP;
