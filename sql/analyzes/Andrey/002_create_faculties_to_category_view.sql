@@ -1,7 +1,5 @@
 -- ~91ms
-USE uni_library
-GO
-ALTER VIEW FacultiesCategoriesIssuedBooks
+CREATE OR REPLACE VIEW FacultiesCategoriesIssuedBooks
 AS
 SELECT Faculty_name, Category_name, Issue_date
 FROM Issues
@@ -9,5 +7,6 @@ FROM Issues
          INNER JOIN Instance I on Issues.Instance_id = I.Instance_id
          INNER JOIN Books B on I.Book_id = B.Book_id
          INNER JOIN Groups G2 on R2.Group_id = G2.Group_id
-         INNER JOIN Category C on B.Category_id = C.Category_id
+         INNER JOIN subject S on B.subject_id = S.subject_id
+         INNER JOIN category C ON S.category_id = C.category_id
          INNER JOIN Faculties F on G2.Faculty_id = F.Faculty_id

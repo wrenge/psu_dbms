@@ -1,5 +1,3 @@
-USE uni_library
-GO
 CREATE VIEW ReaderIssuesView AS
     SELECT R2.Reader_id,
            Reader_surname,
