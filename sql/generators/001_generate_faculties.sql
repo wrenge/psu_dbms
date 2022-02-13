@@ -11,7 +11,7 @@ BEGIN
     )
 
     BULK INSERT #Faculties_Staging
-        FROM 'C:\psu-dbms\data\Faculties.csv'
+        FROM '/usr/import/data/Faculties.csv'
         WITH
         (
         FIRSTROW = 2,

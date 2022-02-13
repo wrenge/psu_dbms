@@ -10,7 +10,7 @@ BEGIN
     )
 
     BULK INSERT #Books_Staging
-        FROM 'C:\psu-dbms\data\fiction_books.csv'
+        FROM '/usr/import/data/fiction_books.csv'
         WITH
         (
         FIRSTROW = 2,

@@ -10,7 +10,7 @@ BEGIN
     )
 
     BULK INSERT #Publishers_Staging
-        FROM 'C:\psu-dbms\data\Publishers.csv'
+        FROM '/usr/import/data/Publishers.csv'
         WITH
         (
         FIRSTROW = 2,

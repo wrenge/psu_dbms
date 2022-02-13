@@ -10,7 +10,7 @@ BEGIN
     )
 
     BULK INSERT #Subjects_Staging
-        FROM 'C:\psu-dbms\data\subjects.csv'
+        FROM '/usr/import/data/subjects.csv'
         WITH
         (
         FIRSTROW = 2,

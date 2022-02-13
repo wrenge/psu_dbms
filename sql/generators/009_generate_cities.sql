@@ -10,7 +10,7 @@ BEGIN
     )
 
     BULK INSERT #Cities_Staging
-        FROM 'C:\psu-dbms\data\City.csv'
+        FROM '/usr/import/data/City.csv'
         WITH
         (
         FIRSTROW = 2,

@@ -10,7 +10,7 @@ BEGIN
     )
 
     BULK INSERT #Group_Names
-        FROM 'C:\psu-dbms\data\Groups.csv'
+        FROM '/usr/import/data/Groups.csv'
         WITH
         (
         FIRSTROW = 2,

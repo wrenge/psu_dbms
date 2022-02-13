@@ -10,7 +10,7 @@ BEGIN
     )
 
     BULK INSERT #Classes_Staging
-        FROM 'C:\psu-dbms\data\Classes.csv'
+        FROM '/usr/import/data/Classes.csv'
         WITH
         (
         FIRSTROW = 2,

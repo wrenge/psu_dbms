@@ -10,7 +10,7 @@ BEGIN
     )
 
     BULK INSERT russian_surnames
-        FROM 'C:\psu-dbms\data\russian_surnames.csv'
+        FROM '/usr/import/data/russian_surnames.csv'
         WITH
         (
         FIRSTROW = 2,
