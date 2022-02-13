@@ -1,0 +1,12 @@
+version: '3.1'
+services:
+  mssql:
+    image: mcr.microsoft.com/mssql/server
+    init: true
+    environment:
+      - SA_PASSWORD=Strong@password123
+      - ACCEPT_EULA=Y
+    volumes:
+      - './../../data:/usr/import/data'
+    ports:
+      - "1433:1433"
