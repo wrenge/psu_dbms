@@ -1,0 +1,28 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "EntityFrameworkTest", "EntityFrameworkTest\EntityFrameworkTest.csproj", "{A7DA0131-C61E-4057-BFB3-722CE3252CD1}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniLibrary.Entities", "UniLibrary.Entities\UniLibrary.Entities.csproj", "{A6276A85-35AC-446F-AA7F-792573BC3472}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "UniLibrary.Database", "UniLibrary.Database\UniLibrary.Database.csproj", "{12B7B861-6077-40F9-BB56-D8F14EAF297F}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{A7DA0131-C61E-4057-BFB3-722CE3252CD1}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A7DA0131-C61E-4057-BFB3-722CE3252CD1}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A7DA0131-C61E-4057-BFB3-722CE3252CD1}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A7DA0131-C61E-4057-BFB3-722CE3252CD1}.Release|Any CPU.Build.0 = Release|Any CPU
+		{A6276A85-35AC-446F-AA7F-792573BC3472}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{A6276A85-35AC-446F-AA7F-792573BC3472}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{A6276A85-35AC-446F-AA7F-792573BC3472}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{A6276A85-35AC-446F-AA7F-792573BC3472}.Release|Any CPU.Build.0 = Release|Any CPU
+		{12B7B861-6077-40F9-BB56-D8F14EAF297F}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{12B7B861-6077-40F9-BB56-D8F14EAF297F}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{12B7B861-6077-40F9-BB56-D8F14EAF297F}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{12B7B861-6077-40F9-BB56-D8F14EAF297F}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+EndGlobal
